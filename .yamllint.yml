@@ -1,0 +1,14 @@
+# SPDX-FileCopyrightText: 2026 Georges Martin <jrjsmrtn@gmail.com>
+# SPDX-License-Identifier: Apache-2.0
+---
+extends: default
+
+rules:
+  line-length:
+    max: 100
+  # GitHub workflows use `on:` as a mapping key, which the truthy rule reads as
+  # the boolean it is not. Checking values only keeps the rule useful.
+  truthy:
+    check-keys: false
+  comments:
+    min-spaces-from-content: 1

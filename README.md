@@ -91,6 +91,35 @@ and can still return `200`. Waiting on anything weaker is how an integration sui
 hanging until its own timeout with nothing useful in the log. `compose.ci.yml`'s healthcheck
 and `bin/measure.sh` both use exactly this criterion.
 
+## CI
+
+`.github/workflows/ci.yml` builds the image, brings the stack up with
+`docker compose -f compose.ci.yml up --build --wait`, and runs `bin/smoke-test.sh`.
+
+`--wait` is the whole readiness gate: it blocks until every healthcheck passes and fails the
+job if one never does, so there are no sleeps and no polling loops in the workflow. The
+criterion it waits for is the one above, encoded in the compose healthcheck.
+
+The smoke test goes further than "the API answered" — it asserts the status contract, then
+creates a file repository, reads it back and deletes it. A POST that returns a href while
+leaving nothing behind would pass a weaker check.
+
+Run the same thing locally against a stack you started by hand:
+
+```bash
+bin/smoke-test.sh http://localhost:24817 password
+```
+
+**CI does not publish the image.** It is pushed by hand to an internal registry that a
+hosted runner cannot reach.
+
+### Consuming it from another project
+
+The intended consumer is a separate front-end project whose tests drive the Pulp REST API.
+Copy the two services out of `compose.ci.yml`, or run the published image directly with a
+PostgreSQL service container — the only settings that matter are `POSTGRES_*`,
+`PULP_ADMIN_PASSWORD` and a `PULP_CONTENT_ORIGIN` the test client can actually reach.
+
 ## Measure it
 
 ```bash

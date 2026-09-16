@@ -19,6 +19,11 @@ All notable changes to this project are documented here. The format follows
   `python:3.13-slim`, no Redis, no nginx, no embedded database, no supervisor.
 - `bin/measure.sh`, which builds the image and proves it serves a usable API, and
   `compose.ci.yml` as the CI-facing shape.
+- A GitHub Actions workflow that builds the image, waits on the compose healthchecks
+  (`up --wait`, so no sleeps) and runs the new `bin/smoke-test.sh` — which asserts the
+  status contract, then creates a file repository, reads it back and deletes it.
+- `.yamllint.yml` and a yamllint pre-commit gate, now that the repository carries YAML
+  worth linting.
 
 Measured 2026-09-16, pulpcore 3.118.0, both architectures built natively:
 

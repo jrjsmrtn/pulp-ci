@@ -4,7 +4,7 @@
 # Only gates that can run without building the image. The build takes minutes
 # and needs a running podman machine, so it belongs in `bin/measure.sh` and in
 # CI, not on every commit.
-
+---
 pre-commit:
   parallel: true
   commands:
@@ -18,6 +18,10 @@ pre-commit:
     shfmt:
       glob: "*.sh"
       run: shfmt --diff {staged_files}
+
+    yamllint:
+      glob: "*.{yml,yaml}"
+      run: yamllint -c .yamllint.yml {staged_files}
 
     reuse:
       run: 'reuse lint -q && echo "✓ reuse: compliant"'

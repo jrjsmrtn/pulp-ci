@@ -7,7 +7,7 @@
 # `bin/measure.sh` deliberately does NOT use this file; it drives podman
 # directly so that the measurement does not depend on which compose
 # implementation happens to be installed.
-
+---
 services:
   postgres:
     image: docker.io/library/postgres:17-alpine

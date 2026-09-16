@@ -1,0 +1,63 @@
+# SPDX-FileCopyrightText: 2026 Georges Martin <jrjsmrtn@gmail.com>
+# SPDX-License-Identifier: Apache-2.0
+#
+# Proves the image still builds and still serves a usable Pulp API.
+#
+# There is no unit-test suite to run here (ADR-0002): the deliverable is an
+# image, and the only meaningful assertion about it is that a client can drive
+# the API through it. That assertion is `bin/smoke-test.sh`.
+#
+# Nothing in this workflow publishes the image. It is pushed by hand to an
+# internal registry that a hosted runner cannot reach.
+---
+name: ci
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  integration:
+    name: build the image and exercise the API
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Fail here with an obvious message rather than three steps later with a
+      # confusing one.
+      - name: Check compose is available
+        run: docker compose version
+
+      # `--wait` blocks until every healthcheck passes and exits non-zero if one
+      # never does, so this single command is the readiness gate -- no sleeps.
+      # The pulp healthcheck in compose.ci.yml encodes the real criterion
+      # (database connected AND a worker online), not merely an open port.
+      - name: Build and start the stack
+        run: docker compose -f compose.ci.yml up --build --detach --wait
+
+      - name: Exercise the API
+        run: ./bin/smoke-test.sh http://localhost:24817 password
+
+      - name: Record the image size
+        run: |
+          size=$(docker image inspect --format '{{.Size}}' localhost/pulp-ci:dev)
+          layers=$(docker image inspect --format '{{len .RootFS.Layers}}' localhost/pulp-ci:dev)
+          printf '### Image\n\n- size: %s MB (%s bytes)\n- layers: %s\n' \
+            "$((size / 1000 / 1000))" "$size" "$layers" >>"$GITHUB_STEP_SUMMARY"
+
+      # Without this a failure shows only the step that failed, and the reason
+      # is always in the container log.
+      - name: Dump logs on failure
+        if: failure()
+        run: docker compose -f compose.ci.yml logs --tail 150
+
+      - name: Tear down
+        if: always()
+        run: docker compose -f compose.ci.yml down --volumes
