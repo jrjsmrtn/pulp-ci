@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: 2026 Georges Martin <jrjsmrtn@gmail.com>
+# SPDX-License-Identifier: Apache-2.0
+#
+# Only gates that can run without building the image. The build takes minutes
+# and needs a running podman machine, so it belongs in `bin/measure.sh` and in
+# CI, not on every commit.
+
+pre-commit:
+  parallel: true
+  commands:
+    gitleaks:
+      run: gitleaks protect --staged --redact --verbose
+
+    shellcheck:
+      glob: "*.sh"
+      run: shellcheck {staged_files}
+
+    shfmt:
+      glob: "*.sh"
+      run: shfmt --diff {staged_files}
+
+    reuse:
+      run: 'reuse lint -q && echo "✓ reuse: compliant"'

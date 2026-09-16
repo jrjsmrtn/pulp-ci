@@ -1,0 +1,18 @@
+# SPDX-FileCopyrightText: 2026 Georges Martin <jrjsmrtn@gmail.com>
+# SPDX-License-Identifier: Apache-2.0
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# shfmt reads these. Without shell_variant it inherits a posix setting from an
+# outer .editorconfig and rejects arrays, which both scripts here use.
+[*.sh]
+shell_variant = bash
+indent_style = tab
+binary_next_line = true
+switch_case_indent = true

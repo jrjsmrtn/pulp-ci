@@ -1,0 +1,28 @@
+# SPDX-FileCopyrightText: 2026 Georges Martin <jrjsmrtn@gmail.com>
+# SPDX-License-Identifier: Apache-2.0
+
+# Secrets and credentials
+.env
+.env.*
+!.env.example
+.envrc
+.envrc.local
+*.pem
+*.key
+credentials.json
+secrets.yaml
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Measurement output IS committed: it is the evidence for every size and timing
+# figure in the README and the ADRs, and a claim whose measurement was thrown
+# away is just an assertion. Only stray logs are ignored.
+measurements/*.log
+
+# Claude Code local files
+CLAUDE.local.md

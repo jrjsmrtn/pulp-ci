@@ -1,0 +1,58 @@
+# SPDX-FileCopyrightText: 2026 Georges Martin <jrjsmrtn@gmail.com>
+# SPDX-License-Identifier: Apache-2.0
+#
+# The shape a CI job should use: one database service, one Pulp. No Redis and
+# no reverse proxy — see CLAUDE.md for why neither is needed.
+#
+# `bin/measure.sh` deliberately does NOT use this file; it drives podman
+# directly so that the measurement does not depend on which compose
+# implementation happens to be installed.
+
+services:
+  postgres:
+    image: docker.io/library/postgres:17-alpine
+    environment:
+      POSTGRES_DB: pulp
+      POSTGRES_USER: pulp
+      POSTGRES_PASSWORD: pulp
+    # tmpfs, not a volume: the database is thrown away with the job, and
+    # keeping it in RAM removes the slowest part of a cold start.
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pulp -d pulp"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  pulp:
+    image: localhost/pulp-ci:dev
+    build:
+      context: .
+      dockerfile: Containerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: pulp
+      POSTGRES_USER: pulp
+      POSTGRES_PASSWORD: pulp
+      PULP_ADMIN_PASSWORD: password
+      PULP_CONTENT_ORIGIN: http://pulp:24816
+    ports:
+      - "24817:24817"
+      - "24816:24816"
+    # The condition an integration suite actually needs: not "the port is
+    # open", but "the database is connected and a worker is online". A Pulp
+    # that answers 200 with no worker accepts tasks and never runs them.
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          python -c "import json,urllib.request;
+          d=json.load(urllib.request.urlopen('http://127.0.0.1:24817/pulp/api/v3/status/'));
+          exit(0 if d['database_connection']['connected'] and d['online_workers'] else 1)"
+      interval: 3s
+      timeout: 5s
+      retries: 60

@@ -1,0 +1,28 @@
+# SPDX-FileCopyrightText: 2026 Georges Martin <jrjsmrtn@gmail.com>
+# SPDX-License-Identifier: Apache-2.0
+#
+# Architecture Decision Records — pulp-ci
+#
+# YAML rather than a README.md: the adr-tools / Structurizr `!adrs` importer
+# parses every *.md file in this directory and chokes on non-ADR markdown.
+
+foundational:
+  - id: 1
+    file: 0001-record-architecture-decisions.md
+    title: Record Architecture Decisions
+    purpose: HOW TO DECIDE
+    status: Accepted
+  - id: 2
+    file: 0002-adopt-development-best-practices.md
+    title: Adopt Development Best Practices
+    purpose: HOW TO DEVELOP
+    status: Accepted
+  - id: 3
+    file: 0003-trimmed-pulp-image-on-python-slim.md
+    title: Build a Trimmed Pulp Image on python-slim for CI
+    purpose: WHAT TECH
+    status: Accepted
+
+# No ADR-0004 (Operations): this is a Development project. The image is a test
+# fixture, not a deployed service — it has no backup, monitoring or change
+# management story, and inventing one would be fiction.
