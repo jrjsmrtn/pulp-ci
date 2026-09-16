@@ -67,13 +67,18 @@ assumption.
 
 ## Outcome
 
-Measured the same day the decision was taken, arm64, pulpcore 3.118.0:
+Measured the same day the decision was taken, pulpcore 3.118.0, each architecture built
+natively rather than emulated:
 
-| | This image | `quay.io/pulp/pulp` |
-|---|---|---|
-| Compressed (registry transfer) | **102 MB**, 11 layers | 520 MB, 44 layers |
-| Uncompressed (on disk) | **333 MB** | 1484 MB |
-| Container start → usable API | **6.8 s** | not measured |
+| | This image (arm64) | This image (amd64) | `quay.io/pulp/pulp` |
+|---|---|---|---|
+| Compressed (registry transfer) | **102 MB**, 11 layers | not measured | 520 MB arm64 / 538 MB amd64, 44 layers |
+| Uncompressed (on disk) | **333 MB** | **303 MB** | 1484 MB (arm64) |
+| Container start → usable API | **6.8 s** | **21.5 s** | not measured |
+
+The start-up difference is the host, not the image — an M5 laptop against a 2018 Intel Mac
+mini with 4 vCPUs. `pip freeze` is byte-identical across both builds, so the dependency
+resolution does not vary by architecture; only wheels and base layers do.
 
 "Usable API" is the criterion from ADR-0002, not an open port: 93 migrations applied to an
 empty database, a worker online, and `POST /pulp/api/v3/repositories/file/file/` returning

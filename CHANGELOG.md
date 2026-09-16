@@ -20,6 +20,12 @@ All notable changes to this project are documented here. The format follows
 - `bin/measure.sh`, which builds the image and proves it serves a usable API, and
   `compose.ci.yml` as the CI-facing shape.
 
-Measured 2026-09-16, arm64, pulpcore 3.118.0: **102 MB compressed / 333 MB on disk**,
-**6.8 s** from container start to a usable API, against `quay.io/pulp/pulp:latest` at
-520 MB compressed / 1484 MB on disk.
+Measured 2026-09-16, pulpcore 3.118.0, both architectures built natively:
+
+| Arch | On disk | Compressed | Usable API | Host |
+|---|---|---|---|---|
+| arm64 | 333 MB | 102 MB | 6.8 s | Apple M5 |
+| amd64 | 303 MB | not measured | 21.5 s | Intel Mac mini 2018, 4 vCPU |
+
+Against `quay.io/pulp/pulp:latest` at 520 MB compressed / 1484 MB on disk (arm64), 538 MB
+compressed (amd64). `pip freeze` is byte-identical across the two builds.

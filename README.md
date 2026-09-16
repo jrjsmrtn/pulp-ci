@@ -29,7 +29,14 @@ Measured 2026-09-16 on arm64 (Apple M5), pulpcore 3.118.0:
 | Uncompressed — on disk | **333 MB** | 1484 MB |
 | Container start → usable API | **6.8 s** | not measured |
 
-amd64 upstream compressed is 538 MB; this image has not yet been built for amd64.
+Built and measured on amd64 too, natively on an Intel Mac the same day: **303 MB on disk**,
+11 layers, usable API in **21.5 s** — against upstream's 538 MB compressed for that
+architecture. The dependency set resolves byte-identically on both (`pip freeze` output
+matches exactly), so the two builds differ only in wheels and base layers.
+
+The start-up gap is the host, not the image: 6.8 s on an M5 laptop versus 21.5 s on a 2018
+Intel Mac mini with 4 vCPUs. Quote whichever matches the CI runner you are sizing for.
+Compressed size was measured only on arm64.
 
 "Usable API" is a deliberately strict definition — see [Readiness](#readiness).
 
