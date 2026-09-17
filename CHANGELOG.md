@@ -11,6 +11,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-09-17
+
 ### Added
 
 - Project bootstrap at tier t1: `CLAUDE.md`, `README.md`, foundation ADRs, Apache-2.0
@@ -24,6 +26,8 @@ All notable changes to this project are documented here. The format follows
   status contract, then creates a file repository, reads it back and deletes it.
 - `.yamllint.yml` and a yamllint pre-commit gate, now that the repository carries YAML
   worth linting.
+- ADR-0003 records, from tests run against this image, why neither SQLite nor PGlite can
+  replace the PostgreSQL service container.
 
 Measured 2026-09-16, pulpcore 3.118.0, both architectures built natively:
 
