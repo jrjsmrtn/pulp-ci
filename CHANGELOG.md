@@ -16,6 +16,11 @@ All notable changes to this project are documented here. The format follows
 - `actions/checkout` is pinned to a commit SHA (v4.4.0) instead of the movable `v4` tag, and
   a pre-commit gate rejects any workflow action referenced by tag or branch.
 
+### Added
+
+- Dependabot version updates for GitHub Actions: weekly, grouped into one PR, targeting
+  `develop`.
+
 ## [0.1.0] - 2026-09-17
 
 ### Added

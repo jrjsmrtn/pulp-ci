@@ -1,0 +1,30 @@
+# SPDX-FileCopyrightText: 2026 Georges Martin <jrjsmrtn@gmail.com>
+# SPDX-License-Identifier: Apache-2.0
+#
+# Keeps the SHA-pinned actions in .github/workflows current. A pin nobody moves
+# is a pin that silently misses security fixes; Dependabot moves the SHA and
+# the trailing `# vX.Y.Z` comment together.
+#
+# Only github-actions: the image's Python dependencies are deliberately
+# unpinned (ADR-0003), and its base image is not digest-pinned yet, so there is
+# nothing for the pip or docker ecosystems to update.
+---
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    # Gitflow-lite (ADR-0002): changes land on develop, never directly on main.
+    target-branch: develop
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Europe/Brussels
+    # One PR per week for all actions rather than one per action.
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: ci
+    open-pull-requests-limit: 5
