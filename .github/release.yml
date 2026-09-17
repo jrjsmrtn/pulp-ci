@@ -1,0 +1,21 @@
+# SPDX-FileCopyrightText: 2026 Georges Martin <jrjsmrtn@gmail.com>
+# SPDX-License-Identifier: Apache-2.0
+#
+# Categories for GitHub's generated release notes. CHANGELOG.md stays the
+# authoritative record; this only groups pull requests by label.
+---
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+  categories:
+    - title: Breaking changes
+      labels: [breaking]
+    - title: New features
+      labels: [enhancement]
+    - title: Bug fixes
+      labels: [bug]
+    - title: Dependencies
+      labels: [dependencies]
+    - title: Other changes
+      labels: ["*"]

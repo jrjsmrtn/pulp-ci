@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2026 Georges Martin <jrjsmrtn@gmail.com>
+# SPDX-License-Identifier: Apache-2.0
+---
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/jrjsmrtn/pulp-ci/blob/main/SECURITY.md
+    about: Report privately as described in SECURITY.md. Do not open a public issue.
+  - name: A problem in Pulp itself
+    url: https://github.com/pulp/pulpcore/issues
+    about: Bugs in pulpcore or its plugins belong with the Pulp Project.

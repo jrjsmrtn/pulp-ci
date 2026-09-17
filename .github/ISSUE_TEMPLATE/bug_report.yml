@@ -1,0 +1,49 @@
+# SPDX-FileCopyrightText: 2026 Georges Martin <jrjsmrtn@gmail.com>
+# SPDX-License-Identifier: Apache-2.0
+---
+name: Bug report
+description: The image fails to build, start, or serve the Pulp API as documented.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Security problems go to SECURITY.md, not here. Problems in pulpcore or a Pulp
+        plugin itself belong upstream with the Pulp Project.
+  - type: input
+    id: version
+    attributes:
+      label: pulp-ci release and pulpcore version
+      description: The release tag you built from, and `pulpcore==` from the image's
+        /opt/venv/requirements.lock.
+      placeholder: v0.1.1, pulpcore==3.118.0
+    validations:
+      required: true
+  - type: dropdown
+    id: arch
+    attributes:
+      label: Architecture
+      options: [amd64, arm64]
+    validations:
+      required: true
+  - type: input
+    id: runtime
+    attributes:
+      label: Container runtime and CI platform
+      placeholder: docker compose 2.x on GitHub Actions ubuntu-latest
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what you expected
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Container log
+      description: The reason is almost always here. Remove anything private first.
+      render: text
+    validations:
+      required: true

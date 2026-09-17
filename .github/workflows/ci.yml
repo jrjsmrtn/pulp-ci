@@ -42,6 +42,22 @@ jobs:
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: bin/check-dco.sh "$BASE_SHA" "$HEAD_SHA"
 
+  # Reviews dependency changes in pull requests. Here that means GitHub Actions
+  # bumps: the image's Python dependencies are unpinned and have no manifest.
+  # Needs GitHub Advanced Security on a private repository, so it is gated on the
+  # repository being known to be public (ADR-0004) and switches itself on then.
+  dependency-review:
+    name: dependency review
+    if: github.event_name == 'pull_request' && github.event.repository.private == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          fail-on-severity: moderate
+
   integration:
     name: build the image and exercise the API
     runs-on: ubuntu-latest

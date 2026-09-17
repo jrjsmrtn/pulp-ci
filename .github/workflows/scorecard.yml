@@ -1,0 +1,49 @@
+# SPDX-FileCopyrightText: 2026 Georges Martin <jrjsmrtn@gmail.com>
+# SPDX-License-Identifier: Apache-2.0
+#
+# OpenSSF Scorecard: automated supply-chain checks of this repository.
+#
+# Public repositories only (ADR-0004): publishing results and uploading SARIF
+# both fail on a private repository. The job is gated on the repository being
+# known to be public, so it switches itself on when the repository goes public
+# and needs no edit at that point.
+---
+name: scorecard
+
+on:
+  branch_protection_rule:
+  schedule:
+    - cron: "41 7 * * 1" # weekly, Mondays
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  analysis:
+    name: Scorecard analysis
+    # `== false` rather than `!private`: if the repository field is absent from
+    # the event, `!null` is true and the job would run on a private repository.
+    # This form skips unless the repository is known to be public.
+    if: github.event.repository.private == false
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write # upload the SARIF result
+      id-token: write # publish results to the OpenSSF API
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ossf/scorecard-action@2d1146689b8cda280b9bc96326124645441f03bc # v2.4.4
+        with:
+          results_file: results.sarif
+          results_format: sarif
+          publish_results: true
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: SARIF file
+          path: results.sarif
+          retention-days: 5
+      - uses: github/codeql-action/upload-sarif@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4.38.0
+        with:
+          sarif_file: results.sarif

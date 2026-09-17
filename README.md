@@ -42,7 +42,7 @@ The 12th layer is an `apt-get upgrade` of the Debian base, added for the vulnera
 on amd64 on disk, and 11 MB to the compressed transfer on arm64 (102 MB before it).
 
 Compressed sizes are the sum of the layer sizes in the manifests of the `v0.1.1` images
-in the internal registry, read 2026-09-17. `bin/measure.sh` does not report them, because
+in the maintainer's private registry, read 2026-09-17. `bin/measure.sh` does not report them, because
 podman only reports the uncompressed size.
 
 "Usable API" is a deliberately strict definition — see [Readiness](#readiness).
@@ -117,8 +117,11 @@ Run the same thing locally against a stack you started by hand:
 bin/smoke-test.sh http://localhost:24817 password
 ```
 
-**CI does not publish the image.** It is pushed by hand to an internal registry that a
-hosted runner cannot reach.
+**The image is not published to any public registry**, by CI or otherwise
+([ADR-0003](docs/adr/0003-trimmed-pulp-image-on-python-slim.md),
+[ADR-0004](docs/adr/0004-open-the-source-keep-the-image-internal.md)). It ships a fixed
+`SECRET_KEY` and a constant admin password, and it bundles GPL-licensed pulpcore, which
+would need its own licensing analysis before redistribution. Build it from this repository.
 
 ### Vulnerability scanning
 
@@ -139,9 +142,10 @@ image and none in Pulp's Python dependencies; the upgrade cleared all 21.
 
 ### Consuming it from another project
 
-Copy the two services out of `compose.ci.yml`, or run the published image directly with a
-PostgreSQL service container — the only settings that matter are `POSTGRES_*`,
-`PULP_ADMIN_PASSWORD` and a `PULP_CONTENT_ORIGIN` the test client can actually reach.
+Copy the two services out of `compose.ci.yml`, which builds the image from the
+`Containerfile`, and build from a checkout of a release tag rather than a branch. The only
+settings that matter are `POSTGRES_*`, `PULP_ADMIN_PASSWORD` and a
+`PULP_CONTENT_ORIGIN` the test client can actually reach.
 
 ## Measure it
 
@@ -157,12 +161,23 @@ Every number in this README came from that script or from a registry manifest, o
 given. Do not quote a figure it did not produce — sizes and start-up times move with every
 dependency bump, and a stale number reads as a current one.
 
+## Contributing and security
+
+Contributions are welcome under the Developer Certificate of Origin; see
+[CONTRIBUTING.md](CONTRIBUTING.md), which also explains what does and does not belong in a
+test fixture. Report vulnerabilities privately as described in [SECURITY.md](SECURITY.md).
+This project has a single maintainer, and both documents are written to match that.
+Participation is governed by the [Code of Conduct](CODE_OF_CONDUCT.md).
+
+pulp-ci is not part of the Pulp Project and is not affiliated with it or with Red Hat.
+
 ## License
 
 Apache-2.0 — see [LICENSE](LICENSE). This repository is
 [REUSE](https://reuse.software/)-compliant.
 
 The **built image** is a different matter: it is a mixed-license aggregate bundling
-pulpcore (GPL-2.0-or-later) and its dependency tree. It is published only to an internal
-registry. Publishing it anywhere public would require a copyleft-floor analysis first — see
+pulpcore (GPL-2.0-or-later) and its dependency tree. It is not published to any public
+registry; the maintainer's builds go to a private one. Publishing it anywhere public would
+require a copyleft-floor analysis first — see
 [ADR-0002](docs/adr/0002-adopt-development-best-practices.md).

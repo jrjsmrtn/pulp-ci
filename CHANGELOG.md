@@ -20,6 +20,16 @@ All notable changes to this project are documented here. The format follows
   trailer, and a CI job runs `bin/check-dco.sh` on every commit in a pull request.
 - ADR-0004 (Proposed): if the repository goes public, only the source does; the image stays
   internal.
+- `SECURITY.md` and `CODE_OF_CONDUCT.md` (Contributor Covenant 2.1), written for a single
+  maintainer. Vulnerabilities in pulpcore itself are directed to the Pulp Project.
+- Issue forms for bugs and features, a PR template, and `.github/release.yml`.
+- CodeQL (Actions and Python), dependency review, and OpenSSF Scorecard workflows. Each runs
+  only when the repository is public, so they switch on when it is made public.
+
+### Changed
+
+- The README no longer assumes the private registry: consumers build the image from a
+  release tag of this repository.
 
 ## [0.1.1] - 2026-09-17
 

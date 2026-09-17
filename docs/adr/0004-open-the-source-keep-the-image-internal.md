@@ -77,12 +77,19 @@ becomes a checklist rather than a decision about terms.
 **Negative**: this repository's own commits now need a human sign-off. An assistant stages
 its work and hands it back unsigned rather than committing it.
 
+**Prepared for going public** (2026-09-17): `SECURITY.md` and `CODE_OF_CONDUCT.md`, both
+written for a single maintainer; issue forms and a PR template; README wording that no
+longer assumes the private registry; and CodeQL, dependency review and OpenSSF Scorecard
+workflows that run only once the repository is public.
+
 **Still required before the repository is made public** (not decided here):
 
-- `SECURITY.md` with a reporting contact, and `CODE_OF_CONDUCT.md`;
-- issue and PR templates;
-- README and workflow wording that assumes the internal registry;
-- CodeQL, dependency review and OpenSSF Scorecard, gated on the repository being public;
-- repository topics, and branch protection on `main`;
-- an actual consumer, which the project does not yet have;
-- updating the distribution profile in `CLAUDE.md`, when this record is Accepted.
+- repository topics, and disabling the unused wiki and projects;
+- branch protection on `main`;
+- an actual consumer, which the project does not yet have.
+
+**At the moment it is made public:**
+
+- enable private vulnerability reporting, which `SECURITY.md` names as the preferred
+  channel;
+- update the distribution profile in `CLAUDE.md`, and mark this record Accepted.

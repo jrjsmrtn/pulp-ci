@@ -1,0 +1,24 @@
+# SPDX-FileCopyrightText: 2026 Georges Martin <jrjsmrtn@gmail.com>
+# SPDX-License-Identifier: Apache-2.0
+---
+name: Feature request
+description: Something an integration test against the Pulp API needs from the image.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        This image is a CI test fixture, not a deployment. Requests that make it more
+        production-like (TLS, a reverse proxy, a supervisor, an embedded database or Redis)
+        will be declined; see CONTRIBUTING.md, "What belongs here".
+  - type: textarea
+    id: need
+    attributes:
+      label: Which integration test needs this, and why
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Include its likely cost in image size or start-up time, if you know it.
