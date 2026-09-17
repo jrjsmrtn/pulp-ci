@@ -159,7 +159,7 @@ podman build --pull=always \
   --label org.opencontainers.image.revision="$rev" \
   --label org.opencontainers.image.version=0.1.1 \
   --tag registry.example.com/ci/pulp-ci:0.1.1 --file Containerfile .
-# run bin/smoke-test.sh and the grype scan (below) against it, then:
+# run bin/smoke-test.sh and the grype scan (see Vulnerability scanning) against it, then:
 podman push registry.example.com/ci/pulp-ci:0.1.1
 ```
 
