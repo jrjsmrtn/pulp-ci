@@ -40,10 +40,31 @@ jobs:
       # The pulp healthcheck in compose.ci.yml encodes the real criterion
       # (database connected AND a worker online), not merely an open port.
       - name: Build and start the stack
+        id: build
         run: docker compose -f compose.ci.yml up --build --detach --wait
 
       - name: Exercise the API
         run: ./bin/smoke-test.sh http://localhost:24817 password
+
+      # Installs a named grype release through its installer at that same tag,
+      # which verifies the release checksums. The action is SHA-pinned; the grype
+      # version is pinned here so a scan-action bump does not silently move it.
+      - name: Install grype
+        id: grype
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        uses: anchore/scan-action/download-grype@27805bf3b4e84b4a5c980df22ed233c00390a439 # v7.4.2
+        with:
+          grype-version: v0.118.0
+
+      # Policy is .grype.yaml at the repository root, read by grype itself, so a
+      # local `grype` run and this step apply the same gate. Runs even when the
+      # smoke test failed: a broken API and a vulnerable image are independent.
+      # Exit 2 = fixable High/Critical found; exit 1 = grype itself failed.
+      - name: Scan the image for fixable High/Critical vulnerabilities
+        if: ${{ !cancelled() && steps.grype.outcome == 'success' }}
+        env:
+          GRYPE: ${{ steps.grype.outputs.cmd }}
+        run: '"$GRYPE" docker:localhost/pulp-ci:dev --output table'
 
       - name: Record the image size
         run: |

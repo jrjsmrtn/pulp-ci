@@ -157,6 +157,30 @@ resolution does not vary by architecture; only wheels and base layers do.
 empty database, a worker online, and `POST /pulp/api/v3/repositories/file/file/` returning
 a created repository.
 
+### Addendum 2026-09-17: the runtime stage upgrades the Debian base
+
+The first grype scan of this image, with a vulnerability database built that morning, found
+21 High or Critical findings with a fix available. All 21 were Debian packages from
+`python:3.13-slim` (`libc6`, `perl-base`, `libpcre2-8-0`, `libsqlite3-0`, `gzip`), although
+the base had been pulled the same day. None were in pulpcore or its Python dependencies.
+Debian had shipped the fixes; the base image had not yet been rebuilt with them.
+
+The runtime stage now runs `apt-get upgrade` before copying the virtualenv. A probe build
+with that layer had no fixable High/Critical findings left. CI fails on any new one, under
+the policy in `.grype.yaml`.
+
+The cost is size, because files replaced by the upgrade still sit in the base layer below.
+Measured with `bin/measure.sh`, same pulpcore and an identical `pip freeze`:
+
+| | arm64 | amd64 |
+|---|---|---|
+| Uncompressed (on disk), before | 333 MB, 11 layers | 303 MB, 11 layers |
+| Uncompressed (on disk), after | **376 MB**, 12 layers | **335 MB**, 12 layers |
+| Container start → usable API, after | 6.8 s | 21.3 s |
+
+Compressed size was not re-measured. The trade stands against upstream: 376 MB on disk
+against 1484 MB.
+
 ## Consequences
 
 **Positive**: fewer services per CI job, roughly a fifth of the bytes to pull, and a

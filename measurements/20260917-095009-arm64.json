@@ -1,0 +1,14 @@
+{
+  "measured_at": "2026-09-17T09:50:09+0200",
+  "image": "localhost/pulp-ci:dev",
+  "architecture": "arm64",
+  "size_bytes": 376438293,
+  "size_mb": 376,
+  "layers": 12,
+  "build_seconds_with_existing_cache": 10.6,
+  "seconds_to_usable_api": 6.8,
+  "readiness_criterion": "status 200 with database_connection.connected true and online_workers non-empty",
+  "first_poll_verdict": "not-json",
+  "pulpcore": "pulpcore==3.118.0",
+  "postgres_image": "docker.io/library/postgres:17-alpine"
+}

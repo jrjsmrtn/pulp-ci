@@ -21,22 +21,26 @@ container the job controls, nothing browses a web UI, and a supervisor is active
 — it restarts a dead worker while the API keeps answering `200`, so a broken run looks like
 a hung one.
 
-Measured 2026-09-16 on arm64 (Apple M5), pulpcore 3.118.0:
+Measured 2026-09-17 on arm64 (Apple M5), pulpcore 3.118.0, `bin/measure.sh`:
 
 | | This image | `quay.io/pulp/pulp:latest` |
 |---|---|---|
-| Compressed — what CI pulls | **102 MB** (11 layers) | 520 MB (44 layers) |
-| Uncompressed — on disk | **333 MB** | 1484 MB |
+| Compressed — what CI pulls | not re-measured (see below) | 520 MB (44 layers) |
+| Uncompressed — on disk | **376 MB** (12 layers) | 1484 MB |
 | Container start → usable API | **6.8 s** | not measured |
 
-Built and measured on amd64 too, natively on an Intel Mac the same day: **303 MB on disk**,
-11 layers, usable API in **21.5 s** — against upstream's 538 MB compressed for that
+Built and measured on amd64 too, natively on an Intel Mac the same day: **335 MB on disk**,
+12 layers, usable API in **21.3 s** — against upstream's 538 MB compressed for that
 architecture. The dependency set resolves byte-identically on both (`pip freeze` output
 matches exactly), so the two builds differ only in wheels and base layers.
 
-The start-up gap is the host, not the image: 6.8 s on an M5 laptop versus 21.5 s on a 2018
+The start-up gap is the host, not the image: 6.8 s on an M5 laptop versus 21.3 s on a 2018
 Intel Mac mini with 4 vCPUs. Quote whichever matches the CI runner you are sizing for.
-Compressed size was measured only on arm64.
+
+The 12th layer is an `apt-get upgrade` of the Debian base, added for the vulnerability scan
+(see [Vulnerability scanning](#vulnerability-scanning)); it added 43 MB on arm64 and 32 MB
+on amd64. Compressed size was last measured before it, at **102 MB** (arm64, 11 layers, the
+`v0.1.0` image in the registry), and has not been measured since.
 
 "Usable API" is a deliberately strict definition — see [Readiness](#readiness).
 
@@ -112,6 +116,23 @@ bin/smoke-test.sh http://localhost:24817 password
 
 **CI does not publish the image.** It is pushed by hand to an internal registry that a
 hosted runner cannot reach.
+
+### Vulnerability scanning
+
+CI scans the built image with [grype](https://github.com/anchore/grype) and **fails on any
+High or Critical finding that has a fix available**. Findings with no fix (`wont-fix`,
+`not-fixed`, `unknown`) are reported but never fail the build: nothing in this repository
+could act on them. The policy is `.grype.yaml`, which grype reads from the repository root,
+so a local run applies the same gate:
+
+```bash
+podman save --format oci-archive -o /tmp/pulp-ci.tar localhost/pulp-ci:dev
+grype oci-archive:/tmp/pulp-ci.tar   # exit 2 = policy failed, 1 = grype error
+```
+
+The runtime stage runs `apt-get upgrade` because `python:*-slim` lags Debian's security
+fixes. The first scan, on 2026-09-17, found 21 fixable High/Critical findings in the base
+image and none in Pulp's Python dependencies; the upgrade cleared all 21.
 
 ### Consuming it from another project
 

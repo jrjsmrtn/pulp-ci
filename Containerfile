@@ -46,6 +46,16 @@ ENV VIRTUAL_ENV=/opt/venv \
 	PYTHONUNBUFFERED=1 \
 	PYTHONDONTWRITEBYTECODE=1
 
+# Debian publishes security fixes faster than python:*-slim is rebuilt: on
+# 2026-09-17 a base pulled that morning carried 21 High/Critical findings that
+# Debian had already fixed (libc6, perl-base, libpcre2, libsqlite3, gzip), and
+# this upgrade cleared all of them. It costs a layer of replaced files, because
+# the base layer underneath cannot shrink. The CI scan (.grype.yaml) is what
+# notices if it stops being enough.
+RUN apt-get update \
+	&& apt-get upgrade --assume-yes --no-install-recommends \
+	&& rm -rf /var/lib/apt/lists/*
+
 COPY --from=build /opt/venv /opt/venv
 
 # Runs as a normal user: CI runners vary in how they treat root-owned

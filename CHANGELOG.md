@@ -19,11 +19,18 @@ All notable changes to this project are documented here. The format follows
   require Node 24 (v5), store credentials in a separate file (v6) and refuse fork checkouts
   under `pull_request_target`/`workflow_run` (v7); none applies to this workflow, which
   passes no inputs and uses neither trigger.
+- The runtime stage runs `apt-get upgrade`, clearing 21 fixable High/Critical findings in
+  the `python:3.13-slim` base. On disk the image grows from 333 to 376 MB on arm64 and from
+  303 to 335 MB on amd64 (12 layers). Start-up measured 6.8 s and 21.3 s, against 6.8 s
+  and 21.5 s before.
 
 ### Added
 
 - Dependabot version updates for GitHub Actions: weekly, grouped into one PR, targeting
   `develop`.
+- A grype scan in CI that fails on High/Critical findings with a fix available. The policy
+  is `.grype.yaml`, shared by CI and local runs; grype v0.118.0 is installed through a
+  SHA-pinned `anchore/scan-action/download-grype`.
 
 ## [0.1.0] - 2026-09-17
 

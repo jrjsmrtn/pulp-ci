@@ -1,0 +1,17 @@
+# SPDX-FileCopyrightText: 2026 Georges Martin <jrjsmrtn@gmail.com>
+# SPDX-License-Identifier: Apache-2.0
+#
+# Vulnerability policy for the built image, read by grype from the repository
+# root — the same file locally and in CI, so the gate has one definition.
+#
+# Fail only on High or Critical findings that have a fix available. A finding
+# with no fix gives nobody anything to do, and gating on it would keep CI red
+# for reasons no change here can address. When a fix ships, the finding's fix
+# state changes and the gate picks it up without anyone editing this file.
+---
+fail-on-severity: high
+
+ignore:
+  - fix-state: wont-fix
+  - fix-state: not-fixed
+  - fix-state: unknown
