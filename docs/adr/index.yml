@@ -23,6 +23,13 @@ foundational:
     purpose: WHAT TECH
     status: Accepted
 
-# No ADR-0004 (Operations): this is a Development project. The image is a test
-# fixture, not a deployed service — it has no backup, monitoring or change
-# management story, and inventing one would be fiction.
+# No Operations ADR: this is a Development project. The image is a test fixture,
+# not a deployed service — it has no backup, monitoring or change management
+# story, and inventing one would be fiction. The number 4 went to the first
+# project-specific decision below.
+
+decisions:
+  - id: 4
+    file: 0004-open-the-source-keep-the-image-internal.md
+    title: Open the Source, Keep the Image Internal
+    status: Proposed

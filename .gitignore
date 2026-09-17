@@ -29,3 +29,8 @@ CLAUDE.local.md
 
 # Personal tmux session layout
 .tmuxp.yml
+
+# OS and editor litter
+.DS_Store
+.idea/
+.vscode/

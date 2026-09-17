@@ -22,6 +22,26 @@ permissions:
   contents: read
 
 jobs:
+  # DCO (ADR-0004): every non-merge commit in a pull request must be signed off by
+  # its author. Contributors run none of this repository's hooks, so this is where
+  # incoming changes are checked. Pushes are not checked here: they come from the
+  # maintainer, whose local commit-msg hook already applies.
+  dco:
+    name: DCO sign-off
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # both PR endpoints are needed; a shallow clone exits 2
+      # Passed through env rather than interpolated into the command, even though
+      # both values are SHAs computed by GitHub.
+      - name: Check sign-off on every commit in the pull request
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: bin/check-dco.sh "$BASE_SHA" "$HEAD_SHA"
+
   integration:
     name: build the image and exercise the API
     runs-on: ubuntu-latest

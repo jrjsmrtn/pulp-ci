@@ -5,6 +5,29 @@
 # and needs a running podman machine, so it belongs in `bin/measure.sh` and in
 # CI, not on every commit.
 ---
+# DCO (ADR-0004): this gate REJECTS an unsigned commit rather than signing for you.
+# git deliberately has no `commit.signoff` setting: a trailer added automatically
+# could have been added without the committer's awareness, which is the one thing
+# the sign-off exists to rule out. Contributors run none of these hooks, so pull
+# requests are checked in CI by bin/check-dco.sh.
+commit-msg:
+  commands:
+    dco-signoff:
+      # {1} is the path to the prepared commit message.
+      run: >
+        if [ -f "$(git rev-parse --git-dir)/MERGE_HEAD" ]; then
+          exit 0;
+        elif grep -qiE '^Signed-off-by: .+ <[^>]+@[^>]+>' "{1}"; then
+          exit 0;
+        else
+          echo "FAIL: no Signed-off-by trailer. This project uses the DCO.";
+          echo "  sign off:   git commit -s";
+          echo "  fix last:   git commit -s --amend --no-edit";
+          echo "  fix branch: git rebase --signoff develop";
+          echo "  terms:      CONTRIBUTING.md -> Contribution terms";
+          exit 1;
+        fi
+
 pre-commit:
   parallel: true
   commands:

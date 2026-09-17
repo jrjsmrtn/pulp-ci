@@ -11,6 +11,16 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `CONTRIBUTING.md`: scope, development setup, how to check a change, and the contribution
+  terms. Contributions are under the Developer Certificate of Origin 1.1, and AI-assisted
+  contributions are permitted with no disclosure rule (ADR-0004).
+- DCO enforcement: a lefthook `commit-msg` hook rejects commits without a `Signed-off-by:`
+  trailer, and a CI job runs `bin/check-dco.sh` on every commit in a pull request.
+- ADR-0004 (Proposed): if the repository goes public, only the source does; the image stays
+  internal.
+
 ## [0.1.1] - 2026-09-17
 
 ### Changed
