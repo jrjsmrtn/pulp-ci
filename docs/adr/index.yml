@@ -32,4 +32,4 @@ decisions:
   - id: 4
     file: 0004-open-the-source-keep-the-image-internal.md
     title: Open the Source, Keep the Image Internal
-    status: Proposed
+    status: Accepted

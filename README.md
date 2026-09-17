@@ -8,6 +8,7 @@ SPDX-License-Identifier: Apache-2.0
 [![CI](https://github.com/jrjsmrtn/pulp-ci/actions/workflows/ci.yml/badge.svg)](https://github.com/jrjsmrtn/pulp-ci/actions/workflows/ci.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![REUSE status](https://api.reuse.software/badge/github.com/jrjsmrtn/pulp-ci)](https://api.reuse.software/info/github.com/jrjsmrtn/pulp-ci)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/jrjsmrtn/pulp-ci/badge)](https://scorecard.dev/viewer/?uri=github.com/jrjsmrtn/pulp-ci)
 
 A [Pulp](https://pulpproject.org) container image for running integration tests against the
 Pulp REST API in CI — and for nothing else.

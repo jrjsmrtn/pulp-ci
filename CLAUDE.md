@@ -14,8 +14,11 @@ Guidance for Claude Code when working in this repository.
 - **Stack**: Containerfile, podman, Python (pulpcore)
 - **License**: Apache-2.0
 - **Tier**: t1
-- **Distribution profile**: Private (ships-artifacts: yes — an internal OCI registry only,
-  never a public one; the registry's address is in `CLAUDE.local.md`)
+- **Distribution profile**: Public source, private image (ADR-0004). The repository is
+  public on GitHub since 2026-09-17. The image ships to an internal OCI registry only, never
+  a public one; the registry's address is in `CLAUDE.local.md`. Consumers build from source.
+- **Contribution terms**: DCO 1.1, enforced. Every commit needs a human `Signed-off-by:`,
+  so an assistant stages its work and hands the commit back unsigned.
 
 ## Project Tier
 

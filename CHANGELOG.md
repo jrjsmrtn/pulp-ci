@@ -32,6 +32,8 @@ All notable changes to this project are documented here. The format follows
   release tag of this repository, either in the test job or once per release into their own
   registry.
 - ADR-0004 records that no image is published to GHCR, public or private, and why.
+- The repository is public (2026-09-17). ADR-0004 is Accepted, `CLAUDE.md` describes the
+  public-source, private-image profile, and the README carries an OpenSSF Scorecard badge.
 
 ## [0.1.1] - 2026-09-17
 

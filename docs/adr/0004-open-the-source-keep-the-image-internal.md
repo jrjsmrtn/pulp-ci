@@ -9,10 +9,10 @@ Date: 2026-09-17
 
 ## Status
 
-Proposed
+Accepted
 
-The contribution terms below are decided and take effect now. Making the repository public
-is not decided, and this record becomes Accepted only when that happens.
+Proposed on 2026-09-17, when the contribution terms took effect. Accepted the same day, when
+the repository was made public.
 
 ## Context
 
@@ -100,16 +100,20 @@ written for a single maintainer; issue forms and a PR template; README wording t
 longer assumes the private registry; and CodeQL, dependency review and OpenSSF Scorecard
 workflows that run only once the repository is public.
 
-**Still required before the repository is made public** (not decided here):
+**Made public on 2026-09-17.** Immediately before, the full history (20 commits, every
+blob, all refs), the commit messages and all 21 GitHub Actions run logs were searched again
+for secrets and for homelab host names, internal addresses and local paths. Nothing was
+found. Then:
 
-- repository topics, and disabling the unused wiki and projects;
-- branch protection on `main`.
+- topics set, wiki and projects disabled, branches deleted on merge;
+- `main` and `develop` protected against force-pushes and deletion. No pull request is
+  required, because the single maintainer fast-forwards `main` from `develop`;
+- private vulnerability reporting enabled;
+- the public-gated workflows switched on as designed: CodeQL (Actions and Python) found
+  nothing, and OpenSSF Scorecard published a first score of 7;
+- the issue tracker stays thin: the backlog lives in this repository, and issues are for
+  bug reports and feature requests from outside;
+- `CLAUDE.md` updated to the public-source, private-image profile.
 
-**At the moment it is made public:**
-
-- register the repository at <https://api.reuse.software/register>, so the README's REUSE
-  badge stops reading "unregistered" (the CI badge starts working on its own);
-- add the OpenSSF Scorecard badge once the first Scorecard run has published a score;
-- enable private vulnerability reporting, which `SECURITY.md` names as the preferred
-  channel;
-- update the distribution profile in `CLAUDE.md`, and mark this record Accepted.
+**Left for the maintainer**: registering at <https://api.reuse.software/register>, which
+asks for a name and an email, so the README's REUSE badge stops reading "unregistered".
