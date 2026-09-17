@@ -6,7 +6,7 @@
 #
 # - github-actions: the SHA-pinned actions in .github/workflows. Dependabot
 #   moves the SHA and the trailing `# vX.Y.Z` comment together.
-# - docker: the digest-pinned python:3.13-slim base in the Containerfile. Each
+# - docker: the digest-pinned python:3.14-slim base in the Containerfile. Each
 #   proposal is a pull request, so CI builds it, smoke-tests it and runs the
 #   grype scan before anyone merges it.
 #
@@ -41,14 +41,11 @@ updates:
       day: monday
       time: "09:00"
       timezone: Europe/Brussels
-    # Refresh the digest and follow 3.13 patch releases, but do not move to a new
-    # Python minor or major: that changes the interpreter the venv is built for,
-    # and deserves a deliberate change rather than a weekly bump.
-    ignore:
-      - dependency-name: python
-        update-types:
-          - version-update:semver-major
-          - version-update:semver-minor
+    # No ignore rule: Python minor and major bumps arrive as pull requests too,
+    # and are merged only after bin/measure.sh has been run on both
+    # architectures. (An earlier rule meant to hold them back named `python`;
+    # Dependabot calls the image `library/python`, so it never matched. Its
+    # first run proposed 3.14, which was measured and adopted, PR #2.)
     commit-message:
       prefix: build
     open-pull-requests-limit: 2

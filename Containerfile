@@ -16,7 +16,7 @@
 # To check the pin by hand, the registry must answer with the same digest:
 #   curl -sI -H "Authorization: Bearer $TOKEN" \
 #     -H 'Accept: application/vnd.oci.image.index.v1+json' \
-#     https://registry-1.docker.io/v2/library/python/manifests/3.13-slim
+#     https://registry-1.docker.io/v2/library/python/manifests/3.14-slim
 
 # --- build stage -----------------------------------------------------------
 # Compilers live here and nowhere else. Anything without an arm64/amd64 wheel

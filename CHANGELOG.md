@@ -25,13 +25,15 @@ All notable changes to this project are documented here. The format follows
 - Issue forms for bugs and features, a PR template, and `.github/release.yml`.
 - A weekly scheduled CI run, so a newly published vulnerability or a new pulpcore release
   is noticed without waiting for a commit.
-- Dependabot `docker` updates for the base image digest and 3.13 patch releases; a move to
-  a new Python minor version stays a deliberate change.
+- Dependabot `docker` updates for the base image, each checked by CI before merge.
 - CodeQL (Actions and Python), dependency review, and OpenSSF Scorecard workflows. Each runs
   only when the repository is public, so they switch on when it is made public.
 
 ### Changed
 
+- The base image moves from Python 3.13 to 3.14 (`python:3.14-slim`, digest-pinned; PR #2,
+  proposed by Dependabot). Measured with `bin/measure.sh`: on disk 376 → 382 MB on arm64
+  and 335 → 340 MB on amd64, start-up 7.1 s and 22.0 s, and an identical `pip freeze`.
 - The `python:3.13-slim` base is pinned by the digest of its multi-arch OCI index
   (`sha256:9d2e5553…`), in both stages, instead of a tag that upstream can move. It is the
   base `v0.1.1` was built on, so the image content does not change. A pre-commit gate

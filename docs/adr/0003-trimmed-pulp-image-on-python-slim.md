@@ -184,6 +184,23 @@ Compressed figures are layer-size sums from the registry manifests, `v0.1.0` bef
 `v0.1.1` after. The trade stands against upstream: 113 MB against 520 MB to pull, and 376 MB
 against 1484 MB on disk.
 
+### Addendum 2026-09-17: the base moves to Python 3.14
+
+The Decision above names `python:3.13-slim`. The base is now `python:3.14-slim`, pinned by
+the digest of its multi-arch index (`sha256:cad9a2c8…`). Dependabot proposed the bump
+(PR #2). It was adopted after measurement, because nothing in pulpcore 3.118.0's dependency
+set changed and the image barely grew. Measured with `bin/measure.sh` on each architecture,
+built natively:
+
+| | arm64 | amd64 |
+|---|---|---|
+| Uncompressed (on disk), 3.13 → 3.14 | 376 → **382 MB** | 335 → **340 MB** |
+| Container start → usable API on 3.14 | 7.1 s | 22.0 s |
+| `pip freeze` | identical | identical |
+
+The grype check passed on both, with the same counts as on 3.13. Compressed size on 3.14
+has not been measured. The reasons for a slim Debian base over UBI are unchanged.
+
 ## Consequences
 
 **Positive**: fewer services per CI job, roughly a fifth of the bytes to pull, and a

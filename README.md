@@ -26,35 +26,39 @@ container the job controls, nothing browses a web UI, and a supervisor is active
 — it restarts a dead worker while the API keeps answering `200`, so a broken run looks like
 a hung one.
 
-Measured 2026-09-17 on arm64 (Apple M5), pulpcore 3.118.0, `bin/measure.sh`:
+Measured 2026-09-17 on arm64 (Apple M5), Python 3.14, pulpcore 3.118.0, `bin/measure.sh`:
 
 | | This image | `quay.io/pulp/pulp:latest` |
 |---|---|---|
-| Compressed — what CI pulls | **113 MB** (12 layers) | 520 MB (44 layers) |
-| Uncompressed — on disk | **376 MB** (12 layers) | 1484 MB |
-| Container start → usable API | **6.8 s** | not measured |
+| Compressed — what CI pulls | **113 MB** (12 layers, on Python 3.13) | 520 MB (44 layers) |
+| Uncompressed — on disk | **382 MB** (12 layers) | 1484 MB |
+| Container start → usable API | **7.1 s** | not measured |
 
-Built and measured on amd64 too, natively on an Intel Mac the same day: **335 MB on disk**,
-12 layers, **111 MB compressed**, usable API in **21.3 s** — against upstream's 538 MB
-compressed for that architecture. The dependency set resolves byte-identically on both (`pip freeze` output
+Built and measured on amd64 too, natively on an Intel Mac the same day: **340 MB on disk**,
+12 layers, usable API in **22.0 s**, and **111 MB compressed** on Python 3.13 — against
+upstream's 538 MB compressed for that architecture. The dependency set resolves byte-identically on both (`pip freeze` output
 matches exactly), so the two builds differ only in wheels and base layers.
 
-The start-up gap is the host, not the image: 6.8 s on an M5 laptop versus 21.3 s on a 2018
+The start-up gap is the host, not the image: 7.1 s on an M5 laptop versus 22.0 s on a 2018
 Intel Mac mini with 4 vCPUs. Quote whichever matches the CI runner you are sizing for.
 
 The 12th layer is an `apt-get upgrade` of the Debian base, added for the vulnerability scan
 (see [Vulnerability scanning](#vulnerability-scanning)); it added 43 MB on arm64 and 32 MB
 on amd64 on disk, and 11 MB to the compressed transfer on arm64 (102 MB before it).
 
+Moving the base from Python 3.13 to 3.14 added about 5.5 MB on disk on each architecture,
+with an identical `pip freeze`.
+
 Compressed sizes are the sum of the layer sizes in the manifests of the `v0.1.1` images
-in the maintainer's private registry, read 2026-09-17. `bin/measure.sh` does not report them, because
+(Python 3.13) in the maintainer's private registry, read 2026-09-17; they have not been
+measured on 3.14. `bin/measure.sh` does not report them, because
 podman only reports the uncompressed size.
 
 "Usable API" is a deliberately strict definition — see [Readiness](#readiness).
 
 ## What is in it
 
-`pulpcore` and `pulp-file`, in a virtualenv on `python:3.13-slim`, running three processes
+`pulpcore` and `pulp-file`, in a virtualenv on `python:3.14-slim`, running three processes
 under a shell entrypoint: `pulpcore-api` (:24817), `pulpcore-content` (:24816) and
 `pulpcore-worker`.
 
