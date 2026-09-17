@@ -11,6 +11,11 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- The README and ADR-0003 give the compressed size on Python 3.14, read from the `v0.1.2`
+  registry manifests: 114.4 MB (arm64) and 112.5 MB (amd64).
+
 ## [0.1.2] - 2026-09-17
 
 ### Added

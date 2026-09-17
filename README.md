@@ -30,12 +30,12 @@ Measured 2026-09-17 on arm64 (Apple M5), Python 3.14, pulpcore 3.118.0, `bin/mea
 
 | | This image | `quay.io/pulp/pulp:latest` |
 |---|---|---|
-| Compressed — what CI pulls | **113 MB** (12 layers, on Python 3.13) | 520 MB (44 layers) |
+| Compressed — what CI pulls | **114.4 MB** (12 layers) | 520 MB (44 layers) |
 | Uncompressed — on disk | **382 MB** (12 layers) | 1484 MB |
 | Container start → usable API | **7.1 s** | not measured |
 
 Built and measured on amd64 too, natively on an Intel Mac the same day: **340 MB on disk**,
-12 layers, usable API in **22.0 s**, and **111 MB compressed** on Python 3.13 — against
+12 layers, usable API in **22.0 s**, and **112.5 MB compressed** — against
 upstream's 538 MB compressed for that architecture. The dependency set resolves byte-identically on both (`pip freeze` output
 matches exactly), so the two builds differ only in wheels and base layers.
 
@@ -46,12 +46,11 @@ The 12th layer is an `apt-get upgrade` of the Debian base, added for the vulnera
 (see [Vulnerability scanning](#vulnerability-scanning)); it added 43 MB on arm64 and 32 MB
 on amd64 on disk, and 11 MB to the compressed transfer on arm64 (102 MB before it).
 
-Moving the base from Python 3.13 to 3.14 added about 5.5 MB on disk on each architecture,
-with an identical `pip freeze`.
+Moving the base from Python 3.13 to 3.14 added about 5.5 MB on disk and about 1.5 MB
+compressed on each architecture, with an identical `pip freeze`.
 
-Compressed sizes are the sum of the layer sizes in the manifests of the `v0.1.1` images
-(Python 3.13) in the maintainer's private registry, read 2026-09-17; they have not been
-measured on 3.14. `bin/measure.sh` does not report them, because
+Compressed sizes are the sum of the layer sizes in the manifests of the `v0.1.2` images in
+the maintainer's private registry, read 2026-09-17. `bin/measure.sh` does not report them, because
 podman only reports the uncompressed size.
 
 "Usable API" is a deliberately strict definition — see [Readiness](#readiness).

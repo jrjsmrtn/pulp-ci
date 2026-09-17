@@ -198,8 +198,9 @@ built natively:
 | Container start → usable API on 3.14 | 7.1 s | 22.0 s |
 | `pip freeze` | identical | identical |
 
-The grype check passed on both, with the same counts as on 3.13. Compressed size on 3.14
-has not been measured. The reasons for a slim Debian base over UBI are unchanged.
+The grype check passed on both, with the same counts as on 3.13. Compressed size, read later
+the same day from the `v0.1.2` registry manifests, is 114.4 MB (arm64) and 112.5 MB (amd64),
+about 1.5 MB more than on 3.13. The reasons for a slim Debian base over UBI are unchanged.
 
 ## Consequences
 
