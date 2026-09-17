@@ -13,8 +13,12 @@ All notable changes to this project are documented here. The format follows
 
 ### Changed
 
-- `actions/checkout` is pinned to a commit SHA (v4.4.0) instead of the movable `v4` tag, and
-  a pre-commit gate rejects any workflow action referenced by tag or branch.
+- `actions/checkout` is pinned to a commit SHA instead of a movable tag, and a pre-commit
+  gate rejects any workflow action referenced by tag or branch.
+- `actions/checkout` updated from v4.4.0 to v7.0.1 (#1, Dependabot). The majors crossed
+  require Node 24 (v5), store credentials in a separate file (v6) and refuse fork checkouts
+  under `pull_request_target`/`workflow_run` (v7); none applies to this workflow, which
+  passes no inputs and uses neither trigger.
 
 ### Added
 
