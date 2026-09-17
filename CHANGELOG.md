@@ -11,6 +11,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-09-17
+
 ### Added
 
 - `CONTRIBUTING.md`: scope, development setup, how to check a change, and the contribution
@@ -42,6 +44,7 @@ All notable changes to this project are documented here. The format follows
   release tag of this repository, either in the test job or once per release into their own
   registry.
 - ADR-0004 records that no image is published to GHCR, public or private, and why.
+- ADR-0002 no longer describes the project as private and unreleased.
 - The repository is public (2026-09-17). ADR-0004 is Accepted, `CLAUDE.md` describes the
   public-source, private-image profile, and the README carries an OpenSSF Scorecard badge.
 
