@@ -13,8 +13,10 @@ Accepted
 
 ## Context
 
-pulp-ci is a tier-t1 project: a container image and a harness, maintained by one person,
-private, and rebuilt rather than released. The practices below are scaled to that. Several
+pulp-ci is a tier-t1 project: a container image and a harness, maintained by one person.
+Its source is public and its image is distributed privately (ADR-0004; this sentence read
+"private, and rebuilt rather than released" until 2026-09-17, when the repository was made
+public and releases began to be tagged). The practices below are scaled to that. Several
 sections that the house template carries — Diátaxis documentation trees, C4 models, sprint
 cadence, BDD — are deliberately not adopted, because this project has one deliverable and
 no user interface to describe.
