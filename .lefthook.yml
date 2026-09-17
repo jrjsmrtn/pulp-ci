@@ -23,5 +23,13 @@ pre-commit:
       glob: "*.{yml,yaml}"
       run: yamllint -c .yamllint.yml {staged_files}
 
+    # A tag or branch can be moved to different code after review; a commit
+    # SHA cannot. Local actions (`./…`) have no ref and are exempt.
+    actions-pinned:
+      glob: ".github/workflows/*.{yml,yaml}"
+      run: >-
+        ! grep -nE '^\s*-?\s*uses:\s*[^.[:space:]][^@[:space:]]*@' {staged_files}
+        | grep -vE '@[0-9a-f]{40}([[:space:]]|$)'
+
     reuse:
       run: 'reuse lint -q && echo "✓ reuse: compliant"'
