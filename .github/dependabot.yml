@@ -1,13 +1,17 @@
 # SPDX-FileCopyrightText: 2026 Georges Martin <jrjsmrtn@gmail.com>
 # SPDX-License-Identifier: Apache-2.0
 #
-# Keeps the SHA-pinned actions in .github/workflows current. A pin nobody moves
-# is a pin that silently misses security fixes; Dependabot moves the SHA and
-# the trailing `# vX.Y.Z` comment together.
+# Keeps two kinds of pin current. A pin nobody moves is a pin that silently
+# misses security fixes.
 #
-# Only github-actions: the image's Python dependencies are deliberately
-# unpinned (ADR-0003), and its base image is not digest-pinned yet, so there is
-# nothing for the pip or docker ecosystems to update.
+# - github-actions: the SHA-pinned actions in .github/workflows. Dependabot
+#   moves the SHA and the trailing `# vX.Y.Z` comment together.
+# - docker: the digest-pinned python:3.13-slim base in the Containerfile. Each
+#   proposal is a pull request, so CI builds it, smoke-tests it and runs the
+#   grype scan before anyone merges it.
+#
+# Not pip: the image's Python dependencies are deliberately unpinned (ADR-0003),
+# so there is nothing for it to update.
 ---
 version: 2
 updates:
@@ -28,3 +32,23 @@ updates:
     commit-message:
       prefix: ci
     open-pull-requests-limit: 5
+
+  - package-ecosystem: docker
+    directory: /
+    target-branch: develop
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Europe/Brussels
+    # Refresh the digest and follow 3.13 patch releases, but do not move to a new
+    # Python minor or major: that changes the interpreter the venv is built for,
+    # and deserves a deliberate change rather than a weekly bump.
+    ignore:
+      - dependency-name: python
+        update-types:
+          - version-update:semver-major
+          - version-update:semver-minor
+    commit-message:
+      prefix: build
+    open-pull-requests-limit: 2

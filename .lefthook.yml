@@ -54,5 +54,17 @@ pre-commit:
         ! grep -nE '^\s*-?\s*uses:\s*[^.[:space:]][^@[:space:]]*@' {staged_files}
         | grep -vE '@[0-9a-f]{40}([[:space:]]|$)'
 
+    # A base image tag can be repointed upstream; a digest cannot. Every FROM
+    # must carry a full sha256 digest, except a reference to an earlier stage
+    # (`build`) or `scratch`. FROM is matched case-insensitively, as podman
+    # and Docker read it.
+    base-pinned:
+      glob: "{Containerfile,Dockerfile}*"
+      run: >-
+        s='[[:space:]]';
+        ! grep -niE "^$s*FROM$s" {staged_files}
+        | grep -vE "@sha256:[0-9a-f]{64}($s|\$)"
+        | grep -viE "FROM$s+(--platform=[^[:space:]]+$s+)?(build|scratch)($s|\$)"
+
     reuse:
       run: 'reuse lint -q && echo "✓ reuse: compliant"'

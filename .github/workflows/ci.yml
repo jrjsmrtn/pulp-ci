@@ -17,6 +17,12 @@ on:
     branches: [main, develop]
   pull_request:
   workflow_dispatch:
+  # Weekly, with no commit needed. New vulnerabilities reach grype through its
+  # database, not through this repository, so an unchanged image can start
+  # failing the scan. A rebuild also resolves the newest pulpcore, so this run
+  # is where a new Pulp release first shows up (in the build log).
+  schedule:
+    - cron: "23 5 * * 1" # Mondays, before Dependabot's 09:00 run
 
 permissions:
   contents: read

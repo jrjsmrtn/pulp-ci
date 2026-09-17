@@ -5,12 +5,23 @@
 # deliberately absent (Redis, nginx, an embedded database, a supervisor) and
 # why each absence is a design decision rather than an omission.
 
-ARG PYTHON_VERSION=3.13
+# Base image: pinned by the digest of its multi-arch OCI index, so a rebuild
+# gets exactly the base that was reviewed and scanned, on both amd64 and arm64.
+# The tag stays for readability and for Dependabot, which proposes a new digest
+# as a pull request that CI then scans. Both FROM lines must carry the same
+# reference, because the venv built in the first stage runs in the second.
+# The tag is literal rather than an ARG: Dependabot cannot update a FROM that
+# is built from an argument, and a pinned digest ignores a tag that disagrees.
+#
+# To check the pin by hand, the registry must answer with the same digest:
+#   curl -sI -H "Authorization: Bearer $TOKEN" \
+#     -H 'Accept: application/vnd.oci.image.index.v1+json' \
+#     https://registry-1.docker.io/v2/library/python/manifests/3.13-slim
 
 # --- build stage -----------------------------------------------------------
 # Compilers live here and nowhere else. Anything without an arm64/amd64 wheel
 # is built in this stage; the runtime stage never gains a toolchain.
-FROM docker.io/library/python:${PYTHON_VERSION}-slim AS build
+FROM docker.io/library/python:3.13-slim@sha256:9d2e5553305c7c7b0097999bb17187c69b921ccd6bc9d40e4bb5ebe652c00285 AS build
 
 RUN apt-get update \
 	&& apt-get install --no-install-recommends --assume-yes \
@@ -38,7 +49,7 @@ RUN pip install --no-cache-dir --upgrade pip \
 RUN pip freeze > "${VIRTUAL_ENV}/requirements.lock"
 
 # --- runtime stage ---------------------------------------------------------
-FROM docker.io/library/python:${PYTHON_VERSION}-slim
+FROM docker.io/library/python:3.13-slim@sha256:9d2e5553305c7c7b0097999bb17187c69b921ccd6bc9d40e4bb5ebe652c00285
 
 ENV VIRTUAL_ENV=/opt/venv \
 	PATH="/opt/venv/bin:${PATH}" \

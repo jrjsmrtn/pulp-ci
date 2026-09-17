@@ -23,11 +23,19 @@ All notable changes to this project are documented here. The format follows
 - `SECURITY.md` and `CODE_OF_CONDUCT.md` (Contributor Covenant 2.1), written for a single
   maintainer. Vulnerabilities in pulpcore itself are directed to the Pulp Project.
 - Issue forms for bugs and features, a PR template, and `.github/release.yml`.
+- A weekly scheduled CI run, so a newly published vulnerability or a new pulpcore release
+  is noticed without waiting for a commit.
+- Dependabot `docker` updates for the base image digest and 3.13 patch releases; a move to
+  a new Python minor version stays a deliberate change.
 - CodeQL (Actions and Python), dependency review, and OpenSSF Scorecard workflows. Each runs
   only when the repository is public, so they switch on when it is made public.
 
 ### Changed
 
+- The `python:3.13-slim` base is pinned by the digest of its multi-arch OCI index
+  (`sha256:9d2e5553…`), in both stages, instead of a tag that upstream can move. It is the
+  base `v0.1.1` was built on, so the image content does not change. A pre-commit gate
+  rejects any `FROM` without a full digest.
 - The README no longer assumes the private registry: consumers build the image from a
   release tag of this repository, either in the test job or once per release into their own
   registry.
