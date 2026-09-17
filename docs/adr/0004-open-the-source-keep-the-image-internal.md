@@ -107,6 +107,9 @@ workflows that run only once the repository is public.
 
 **At the moment it is made public:**
 
+- register the repository at <https://api.reuse.software/register>, so the README's REUSE
+  badge stops reading "unregistered" (the CI badge starts working on its own);
+- add the OpenSSF Scorecard badge once the first Scorecard run has published a score;
 - enable private vulnerability reporting, which `SECURITY.md` names as the preferred
   channel;
 - update the distribution profile in `CLAUDE.md`, and mark this record Accepted.
