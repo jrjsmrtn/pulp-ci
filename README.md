@@ -142,10 +142,34 @@ image and none in Pulp's Python dependencies; the upgrade cleared all 21.
 
 ### Consuming it from another project
 
-Copy the two services out of `compose.ci.yml`, which builds the image from the
-`Containerfile`, and build from a checkout of a release tag rather than a branch. The only
-settings that matter are `POSTGRES_*`, `PULP_ADMIN_PASSWORD` and a
-`PULP_CONTENT_ORIGIN` the test client can actually reach.
+No prebuilt image is published, so a consumer builds it from a **release tag** of this
+repository, never a branch. There are two ways to do that.
+
+**Build in the test job.** Copy the two services out of `compose.ci.yml`, which builds the
+image from the `Containerfile`. Nothing else is needed, but every run pays for the image
+build.
+
+**Build once per release, into your own registry.** Better when many jobs use the image:
+
+```bash
+git clone --depth 1 --branch v0.1.1 https://github.com/jrjsmrtn/pulp-ci.git
+cd pulp-ci
+rev=$(git rev-parse HEAD)
+podman build --pull=always \
+  --label org.opencontainers.image.revision="$rev" \
+  --label org.opencontainers.image.version=0.1.1 \
+  --tag registry.example.com/ci/pulp-ci:0.1.1 --file Containerfile .
+# run bin/smoke-test.sh and the grype scan (below) against it, then:
+podman push registry.example.com/ci/pulp-ci:0.1.1
+```
+
+Then point the test job's `image:` at that tag instead of `build:`. For both amd64 and
+arm64 runners, build each architecture and combine them into a manifest list; building
+natively is much faster than emulation.
+
+Either way, the only settings that matter are `POSTGRES_*`, `PULP_ADMIN_PASSWORD` and a
+`PULP_CONTENT_ORIGIN` the test client can actually reach. Keep the image in a registry
+that only your CI can read: it carries a fixed `SECRET_KEY` and a constant admin password.
 
 ## Measure it
 

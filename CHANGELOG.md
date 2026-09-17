@@ -29,7 +29,9 @@ All notable changes to this project are documented here. The format follows
 ### Changed
 
 - The README no longer assumes the private registry: consumers build the image from a
-  release tag of this repository.
+  release tag of this repository, either in the test job or once per release into their own
+  registry.
+- ADR-0004 records that no image is published to GHCR, public or private, and why.
 
 ## [0.1.1] - 2026-09-17
 

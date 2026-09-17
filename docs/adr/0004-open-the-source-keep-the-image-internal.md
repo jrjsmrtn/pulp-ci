@@ -43,6 +43,21 @@ agreement of every contributor. Those terms must be settled before the first one
 **If the repository goes public, only the source does.** ADR-0003 stays in force: the image
 is not published to any public registry. Anyone outside builds it from source.
 
+**Consumers build the image from source into a registry they control** (decided
+2026-09-17). A consumer's CI builds from a release tag of this repository and pushes the
+result to its own registry. This project publishes **no image to GHCR**, public or
+private:
+
+- a **public** package would redistribute the insecure-by-design, GPL-bundling image that
+  ADR-0003 keeps internal;
+- a **private** package under the maintainer's personal account cannot be pulled by
+  another organisation's CI token. Pulling it would mean storing the maintainer's personal
+  access token in that organisation's CI secrets, tying a personal account to someone
+  else's infrastructure.
+
+Building from source leaves each consumer holding its own copy of the image, under its own
+registry's access controls, and responsible for its own internal redistribution of it.
+
 **Inbound contributions are under the Developer Certificate of Origin 1.1.** Every commit
 carries a `Signed-off-by:` trailer from its author. Two gates enforce it:
 
@@ -68,6 +83,9 @@ Both terms are stated in `CONTRIBUTING.md`.
 | CLA | Can grant patents and allow relicensing | Contributors may need their employer's signature; no stated need for either grant | Rejected |
 | No stated terms | Zero friction | Relicensing later needs every contributor's agreement | Rejected |
 | Also publish the image | One `pull` for consumers | Insecure constants by design; GPL aggregate needs its own analysis | Rejected (ADR-0003) |
+| Consumers build from source into their own registry | No personal credentials in a consumer's CI; each consumer controls its copy | Each consumer runs its own build, and multi-arch builds if needed | **Selected** |
+| Public GHCR image | Pull-and-go for everyone | Same objections as publishing the image anywhere public | Rejected |
+| Private GHCR image under the personal account | Hosted runners can pull without rebuilding | Another organisation's CI token cannot read it; would need a personal token in that organisation's secrets; package visibility can be flipped to public irreversibly | Rejected |
 
 ## Consequences
 
@@ -85,8 +103,7 @@ workflows that run only once the repository is public.
 **Still required before the repository is made public** (not decided here):
 
 - repository topics, and disabling the unused wiki and projects;
-- branch protection on `main`;
-- an actual consumer, which the project does not yet have.
+- branch protection on `main`.
 
 **At the moment it is made public:**
 
