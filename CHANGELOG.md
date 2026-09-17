@@ -29,8 +29,9 @@ All notable changes to this project are documented here. The format follows
 - Dependabot version updates for GitHub Actions: weekly, grouped into one PR, targeting
   `develop`.
 - A grype scan in CI that fails on High/Critical findings with a fix available. The policy
-  is `.grype.yaml`, shared by CI and local runs; grype v0.118.0 is installed through a
-  SHA-pinned `anchore/scan-action/download-grype`.
+  is `.grype.yaml`, shared by CI and local runs. grype v0.118.0 is installed only after
+  `cosign verify-blob` proves its checksums file was signed by grype's own release workflow,
+  and `sha256sum` ties the downloaded binary to that file.
 
 ## [0.1.0] - 2026-09-17
 
