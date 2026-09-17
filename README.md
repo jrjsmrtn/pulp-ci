@@ -115,7 +115,6 @@ hosted runner cannot reach.
 
 ### Consuming it from another project
 
-The intended consumer is a separate front-end project whose tests drive the Pulp REST API.
 Copy the two services out of `compose.ci.yml`, or run the published image directly with a
 PostgreSQL service container — the only settings that matter are `POSTGRES_*`,
 `PULP_ADMIN_PASSWORD` and a `PULP_CONTENT_ORIGIN` the test client can actually reach.
