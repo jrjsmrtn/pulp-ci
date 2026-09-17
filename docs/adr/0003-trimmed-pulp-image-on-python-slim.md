@@ -42,7 +42,10 @@ entrypoint — `pulpcore-api`, `pulpcore-content`, `pulpcore-worker`.
   dependency at all. This halves the service count in every CI job.
 - **nginx / `pulp-web`.** Upstream's proxy exists to merge the API and content apps onto a
   single port. A test client can address two ports.
-- **PostgreSQL.** A CI service container, where the job can wipe it between runs.
+- **PostgreSQL.** A CI service container, where the job can wipe it between runs. It
+  cannot be replaced by SQLite to drop that service — see
+  [SQLite is not an option](#sqlite-is-not-an-option) — and PGlite runs but does not
+  behave like PostgreSQL — see [PGlite is not a substitute](#pglite-is-not-a-substitute).
 - **s6 or any supervisor.** The entrypoint uses `wait -n` and a trap: when any of the three
   processes dies the container exits, and CI reports a crash instead of a hang. This is a
   feature specific to being a test fixture and would be wrong in production.
@@ -64,6 +67,76 @@ assumption.
 | `pulp-minimal` + `pulp-web` | Upstream-supported; closer to a real split deployment | Two images and a proxy to orchestrate for no test-visible benefit | Rejected |
 | Install pulpcore on the runner directly (no container) | Smallest possible footprint | Runner-state dependent; not reproducible; pollutes the runner | Rejected |
 | Build a purpose-made image (**chosen**) | Only what the tests need; no Redis; crash-fast | Ours to maintain; drifts from upstream packaging | **Selected** |
+| Run on SQLite, no database service | One container per CI job | pulpcore does not run on SQLite — see below | Not viable |
+| Run on PGlite behind `pglite-socket` | Passes the smoke test; no PostgreSQL server | Still a separate database process; all connections share one session, so advisory locks do not exclude and one open transaction blocks every other connection — see below | Rejected |
+
+### SQLite is not an option
+
+Tested 2026-09-17 against this image, pulpcore 3.118.0. With the engine overridden to
+`django.db.backends.sqlite3` (confirmed in effect via `pulpcore-manager shell`),
+`pulpcore-manager migrate` applies migrations up to `core.0097` and then fails at
+`core.0098_pulp_labels` with exit code 1:
+
+```
+ValueError: Cannot quote parameter value {} of type <class 'dict'>
+```
+
+That migration enables PostgreSQL's `hstore` extension and adds `HStoreField` columns,
+neither of which SQLite has. It is not an isolated case. In the installed source:
+
+- the default engine is `django.db.backends.postgresql` (`pulpcore/app/settings.py`);
+- 23 non-test modules import `django.contrib.postgres`;
+- migration `0134_task_insert_trigger` installs a trigger calling `pg_advisory_xact_lock`;
+- nothing outside the tests mentions SQLite.
+
+Getting past the migrations would not be enough either. The **No Redis** omission above
+depends on workers coordinating through PostgreSQL advisory locks, so the task system
+needs PostgreSQL too.
+
+The only way to have one container per CI job is to embed PostgreSQL in the image. That
+is the upstream shape this decision rejects on size. Only 3.118.0 was tested; the
+migration history makes a change in a later release unlikely, but that is an inference.
+
+### PGlite is not a substitute
+
+Tested 2026-09-17 against this image, pulpcore 3.118.0. The database was PGlite 0.5.4
+(PostgreSQL 18.3 compiled to WASM) with its `hstore` extension, served over the
+PostgreSQL wire protocol by `pglite-socket` 0.2.7 with `maxConnections: 20`, running on
+the host.
+
+**It works as far as the smoke test reaches.** Every migration applied, including
+`core.0098_pulp_labels` and `core.0134_task_insert_trigger`. A worker came online,
+`bin/smoke-test.sh` exited 0, and the two tasks it dispatches (`ageneral_delete` and
+`orphan_cleanup`) both reached `completed`.
+
+**It does not behave like PostgreSQL once there is more than one connection.** PGlite is
+a single-connection database. `pglite-socket` accepts many clients by multiplexing them
+onto that one session, and its README warns that "not all use cases are guaranteed to
+work". Probed from inside the Pulp container with two psycopg connections:
+
+| Probe | PostgreSQL | PGlite via `pglite-socket` |
+|---|---|---|
+| `pg_backend_pid()` on two connections | Different | Both `42`: one shared session |
+| B runs `pg_try_advisory_lock(42)` while A holds it | `false` | `true` |
+| A query on another connection while a transaction is open | Answers at once | Blocked until that transaction ends (still blocked after 5 s) |
+
+These break things Pulp depends on:
+
+- **Advisory locks do not exclude.** Workers use them to claim tasks and to keep two
+  tasks off the same resource. The smoke test never runs two tasks against each other,
+  so passing it says nothing about this. A suite that does could see tasks corrupt each
+  other and report it as a Pulp failure.
+- **One open transaction stops every other connection.** Tasks run in transactions, so
+  the API stops answering for as long as a task holds one. If code with a transaction
+  open waits on a second connection, it hangs instead of failing.
+
+Not tested: `LISTEN`/`NOTIFY`, which workers use to wake up, and PGlite's 32-bit WASM
+memory limit under a real workload.
+
+**It would not remove a service either.** Pulp still needs a database process beside it,
+Node and WASM instead of `postgres:17-alpine`. The trade is a real server for one whose
+results differ from production. The one case that might justify it is a runner that
+cannot run containers at all, and no such runner is in scope.
 
 ## Outcome
 
