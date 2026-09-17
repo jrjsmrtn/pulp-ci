@@ -177,9 +177,12 @@ Measured with `bin/measure.sh`, same pulpcore and an identical `pip freeze`:
 | Uncompressed (on disk), before | 333 MB, 11 layers | 303 MB, 11 layers |
 | Uncompressed (on disk), after | **376 MB**, 12 layers | **335 MB**, 12 layers |
 | Container start → usable API, after | 6.8 s | 21.3 s |
+| Compressed (registry transfer), before | 102 MB | not measured |
+| Compressed (registry transfer), after | **113 MB** | **111 MB** |
 
-Compressed size was not re-measured. The trade stands against upstream: 376 MB on disk
-against 1484 MB.
+Compressed figures are layer-size sums from the registry manifests, `v0.1.0` before and
+`v0.1.1` after. The trade stands against upstream: 113 MB against 520 MB to pull, and 376 MB
+against 1484 MB on disk.
 
 ## Consequences
 

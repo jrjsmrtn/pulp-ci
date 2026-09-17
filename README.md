@@ -25,13 +25,13 @@ Measured 2026-09-17 on arm64 (Apple M5), pulpcore 3.118.0, `bin/measure.sh`:
 
 | | This image | `quay.io/pulp/pulp:latest` |
 |---|---|---|
-| Compressed — what CI pulls | not re-measured (see below) | 520 MB (44 layers) |
+| Compressed — what CI pulls | **113 MB** (12 layers) | 520 MB (44 layers) |
 | Uncompressed — on disk | **376 MB** (12 layers) | 1484 MB |
 | Container start → usable API | **6.8 s** | not measured |
 
 Built and measured on amd64 too, natively on an Intel Mac the same day: **335 MB on disk**,
-12 layers, usable API in **21.3 s** — against upstream's 538 MB compressed for that
-architecture. The dependency set resolves byte-identically on both (`pip freeze` output
+12 layers, **111 MB compressed**, usable API in **21.3 s** — against upstream's 538 MB
+compressed for that architecture. The dependency set resolves byte-identically on both (`pip freeze` output
 matches exactly), so the two builds differ only in wheels and base layers.
 
 The start-up gap is the host, not the image: 6.8 s on an M5 laptop versus 21.3 s on a 2018
@@ -39,8 +39,11 @@ Intel Mac mini with 4 vCPUs. Quote whichever matches the CI runner you are sizin
 
 The 12th layer is an `apt-get upgrade` of the Debian base, added for the vulnerability scan
 (see [Vulnerability scanning](#vulnerability-scanning)); it added 43 MB on arm64 and 32 MB
-on amd64. Compressed size was last measured before it, at **102 MB** (arm64, 11 layers, the
-`v0.1.0` image in the registry), and has not been measured since.
+on amd64 on disk, and 11 MB to the compressed transfer on arm64 (102 MB before it).
+
+Compressed sizes are the sum of the layer sizes in the manifests of the `v0.1.1` images
+in the internal registry, read 2026-09-17. `bin/measure.sh` does not report them, because
+podman only reports the uncompressed size.
 
 "Usable API" is a deliberately strict definition — see [Readiness](#readiness).
 
