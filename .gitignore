@@ -26,3 +26,6 @@ measurements/*.log
 
 # Claude Code local files
 CLAUDE.local.md
+
+# Personal tmux session layout
+.tmuxp.yml
