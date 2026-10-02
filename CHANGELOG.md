@@ -13,6 +13,13 @@ All notable changes to this project are documented here. The format follows
 
 ### Changed
 
+- The base image is re-pinned to the current `python:3.14-slim` index digest
+  (`sha256:0741d101…`), and the image now resolves pulpcore 3.120.0 (was 3.118.0) and
+  psycopg 3.3.6 (was 3.3.5). `pulp-file` stays at 1.16.0. The smoke test passes and the
+  grype gate exits 0 on both arm64 and amd64. The pulpcore release notes list a
+  fix for file downloader path sanitation (CVE-2026-90959) in 3.119.1, which this image now
+  includes; 3.118.0 predates it. They list no removal, deprecation or breaking change for
+  3.119 or 3.120.
 - The README and ADR-0003 give the compressed size on Python 3.14, read from the `v0.1.2`
   registry manifests: 114.4 MB (arm64) and 112.5 MB (amd64).
 

@@ -21,7 +21,7 @@
 # --- build stage -----------------------------------------------------------
 # Compilers live here and nowhere else. Anything without an arm64/amd64 wheel
 # is built in this stage; the runtime stage never gains a toolchain.
-FROM docker.io/library/python:3.14-slim@sha256:cad9a2c871761c413caa6fdd6441c783451e740a48aaeba60ae62a8b53525ef6 AS build
+FROM docker.io/library/python:3.14-slim@sha256:0741d101873c12ab927e6f8653feb8862b9bd58771177acb1b885b95141f91b4 AS build
 
 RUN apt-get update \
 	&& apt-get install --no-install-recommends --assume-yes \
@@ -49,7 +49,7 @@ RUN pip install --no-cache-dir --upgrade pip \
 RUN pip freeze > "${VIRTUAL_ENV}/requirements.lock"
 
 # --- runtime stage ---------------------------------------------------------
-FROM docker.io/library/python:3.14-slim@sha256:cad9a2c871761c413caa6fdd6441c783451e740a48aaeba60ae62a8b53525ef6
+FROM docker.io/library/python:3.14-slim@sha256:0741d101873c12ab927e6f8653feb8862b9bd58771177acb1b885b95141f91b4
 
 ENV VIRTUAL_ENV=/opt/venv \
 	PATH="/opt/venv/bin:${PATH}" \
